@@ -1,0 +1,12 @@
+docker run -it \
+--network=pg-network \
+taxi_ingest:v001 \
+--host=localhost \
+--user=root \
+--password=root \
+--port=5432 \
+--db=ny_taxi \
+--table_name=ny_green_taxi_trips \
+--url=${URL}
+
+

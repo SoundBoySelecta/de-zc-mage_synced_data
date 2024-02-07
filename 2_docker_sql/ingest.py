@@ -19,7 +19,7 @@ def main(params):
     url = params.url
 
 # download gzip, make sure to inform pandas its a gzip
-    os.system(f'aria2c {url} --out {file_name}')
+    os.system(f'wget {url} --output-document={file_name}')
 
 
 # Setup connection to db
