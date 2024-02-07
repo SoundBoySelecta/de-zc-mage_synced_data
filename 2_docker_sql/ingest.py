@@ -60,7 +60,8 @@ def main(params):
     print(
         f'Imported first chunk, resulting in: Dataframe rows: {df_trip_data_in_100k_chunks.shape[0]}, Dataframe columns: {df_trip_data_in_100k_chunks.shape[1]}')
 
-# *****THIS IS NOT NEEDED****, schema in the sense of table definition is automatic.
+# *****THIS IS NOT NEEDED****, schema in the sense of table definition is automatic,
+# when using df.to_sql, no need for DDL with pd.io.sql.get_schema()
 # Create a DDL statement for a new sql table from the dataframe with the associated
 # data types of that system provide name for table "ny_green_taxi",
 # remember this command doesnt actually create the table.
