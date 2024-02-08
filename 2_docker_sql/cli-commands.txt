@@ -38,17 +38,51 @@ docker run -it \
 
 
 1.2.4 Dockerizing the ingestion script
+Build an image from a dockerfile in CWD tag it (-t), 'taxi_ingestion:v001'
+ingesting script: ingest_1.2.4_only_trip_data.py
+Docker command:
+docker build -t taxi_ingest_only_trip_data:v001 .
+
+
 docker run -it \
 --network=pg-network \
-taxi_ingest:v001 \
+taxi_ingest_only_trip_data:v001 \
 --host=localhost \
 --user=root \
 --password=root \
 --port=5432 \
 --db=ny_taxi \
 --table_name=ny_green_taxi_trips \
---url=${URL}
+--url=${URL} \
+
 
 1.2.5 Running Postgres and pgAdmin with Docker-Compose
+Docker compose up
+Docker compose down
+# detach terminal
+Docker compose up -d
+
+1.2.6
+a) Dockerizing the ingestion script with trip and zone data:
+Remember we are connecting to a docker compose image, so we need to indicate
+two arguments --network=pg-network_default and --host=pg-network-pgdatabase-1
+since postgres is now in a network with pgadmin, and been given hostname.
+
+docker build -f Dockerfile_1.2.6_trip_and_zone_data -t \
+> taxi_ingest_trip_and_zone_data:v001 .
+
+Based on docker compose settings
+  docker run -it \
+  --network=pg-network_default \
+  taxi_ingest_trip_and_zone_data:v001 \
+  --host=pg-network-pgdatabase-1 \
+  --user=root \
+  --password=root \
+  --port=5432 \
+  --db=ny_taxi \
+  --trip_table_name=ny_green_taxi_trips \
+  --zone_table_name=ny_taxi_zones \
+  --trip_data_url=${trip_data_url} \
+  --zone_data_url=${zone_data_url}
 
 
