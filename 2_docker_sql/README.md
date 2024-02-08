@@ -1,3 +1,22 @@
+1.2.1 Welcome to docker
+Used docker many times but for newbies:
+download docker desktop for associated os, follow instructions for
+docker hello-world, which if u get working, then docker is working and
+you just created a small webserver with docker welcome html page.
+Basically understand what docker is, as much as people explain it,
+my understanding was wrong for a while, it isnt isolated enviroments
+but isolated processes, it still depends on host os, so obviously
+as host os crashes everything crashes. Versus a vm, if the host os
+crashes, all vm guest os crashes, however if a guest os crashes
+other guest os dont crash, there lies an advantage, maybe not so
+much in cloud instances where there is redundancy. One thing I am still
+researching is the parent layer is said not to neccessarily be an os
+layer, but some have termed it can be solely bare distributions
+(collection of files) or libs, that actually feed off host os/kernel.
+Im still not convinced as Ive always see some flavor of linux
+in STDOUT.
+
+
 1.2.2 Ingesting NY Taxi Data to Postgres
 ingest.ipynb
 To verify the docker postgres image works and for ease of interaction
