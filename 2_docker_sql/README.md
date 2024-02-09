@@ -139,23 +139,23 @@ Confirmed both tables are in postgres thru pgadmin.
    technically we need a few joins.
     a) First way:
 
-        ```
-        SELECT
-        CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
-        CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
-        trips.trip_type,
-        trips.total_amount,
-        trips.trip_distance AS distance,
-        trips.lpep_pickup_datetime AS pickup_time,
-        trips.lpep_dropoff_datetime AS dropoff_time
-        FROM
-        ny_green_taxi_trips AS trips
-        JOIN ny_taxi_zones AS zpu
-        ON trips."PULocationID" = zpu."LocationID"
-        JOIN ny_taxi_zones AS zdo
-        ON trips."DOLocationID" = zdo."LocationID"
-        LIMIT 100
-        ```
+    ```
+    SELECT
+    CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
+    CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
+    trips.trip_type,
+    trips.total_amount,
+    trips.trip_distance AS distance,
+    trips.lpep_pickup_datetime AS pickup_time,
+    trips.lpep_dropoff_datetime AS dropoff_time
+    FROM
+    ny_green_taxi_trips AS trips
+    JOIN ny_taxi_zones AS zpu
+    ON trips."PULocationID" = zpu."LocationID"
+    JOIN ny_taxi_zones AS zdo
+    ON trips."DOLocationID" = zdo."LocationID"
+    LIMIT 100
+    ```
 
     b) Second way:
 
