@@ -187,6 +187,7 @@ Confirmed both tables are in postgres thru pgadmin.
 
 
     ii) joined_trip_zone_data_2019_09_2nd_way:
+    ```
         CREATE TABLE joined_trip_zone_data_2019_09_2nd_way AS
         SELECT
         CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
@@ -202,6 +203,7 @@ Confirmed both tables are in postgres thru pgadmin.
         ON trips."PULocationID" = zpu."LocationID"
         JOIN ny_taxi_zones AS zdo
         ON trips."DOLocationID" = zdo."LocationID"
+    ```
 
 
 
