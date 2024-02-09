@@ -134,7 +134,7 @@ Confirmed both tables are in postgres thru pgadmin.
     LIMIT 10
     ```
 
-5) Join trip and zone data tables on common id(s), there is 2 columns in trips than need represented but 2 columns respectively in the zones table. So
+6) Join trip and zone data tables on common id(s), there is 2 columns in trips than need represented but 2 columns respectively in the zones table. So
    technically we need a few joins.
        a) First way:
         ```
@@ -153,7 +153,7 @@ Confirmed both tables are in postgres thru pgadmin.
         JOIN ny_taxi_zones AS zdo
         ON trips."DOLocationID" = zdo."LocationID"
         LIMIT 100
-        ```
+        ``
 
 
         b) Second way:
