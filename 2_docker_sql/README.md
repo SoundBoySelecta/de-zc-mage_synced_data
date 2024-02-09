@@ -83,6 +83,7 @@ A) Now merging the two data pipeline is needed with the below mods:
 2) duplicate the docker file and name it Dockerfile_1.2.6
 3) edit line 9 ENTRYPOINT to ["python", "ingest_1.2.6.py"]
 4) rebuild image with:
+    ```
     docker build -f Dockerfile_1.2.6 -t taxi_ingest:v002 .
     added or differentiated:
     trip_table_name = params.trip_table_name
@@ -91,6 +92,7 @@ A) Now merging the two data pipeline is needed with the below mods:
     zone_file_name = 'zone.csv'
     trip_data_url = params.trip_data_url
     zone_data_url = params.zone_data_url
+    ```
 
     Six parameters we have add or modify: a x 2, b x 2, c x 2
     In ingestion script:
@@ -120,17 +122,22 @@ A) Now merging the two data pipeline is needed with the below mods:
 Confirmed both tables are in postgres thru pgadmin.
 
 5) Verify tables with a simple query
+    ```
     SELECT *
     FROM ny_green_taxi_trips
     LIMIT 10
+    ```
 
+    ```
     SELECT *
     FROM ny_taxi_zones
     LIMIT 10
+    ```
 
 5) Join trip and zone data tables on common id(s), there is 2 columns in trips than need represented but 2 columns respectively in the zones table. So
    technically we need a few joins.
        a) First way:
+        ```
         SELECT
         CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
         CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
@@ -146,10 +153,11 @@ Confirmed both tables are in postgres thru pgadmin.
         JOIN ny_taxi_zones AS zdo
         ON trips."DOLocationID" = zdo."LocationID"
         LIMIT 100
+        ```
 
 
         b) Second way:
-        CREATE TABLE joined_trip_zone_data_2019_sept AS
+        ```
         SELECT
         CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
         CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
@@ -164,10 +172,12 @@ Confirmed both tables are in postgres thru pgadmin.
         ON trips."PULocationID" = zpu."LocationID"
         JOIN ny_taxi_zones AS zdo
         ON trips."DOLocationID" = zdo."LocationID"
-    c) Verify counts of record on each table
+        ```
+
 
     c) Save query as a table:
      i) joined_trip_zone_data_2019_09_1st_way:
+        ```
         CREATE TABLE joined_trip_zone_data_2019_09_1st_way AS
         SELECT
         CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
@@ -184,10 +194,11 @@ Confirmed both tables are in postgres thru pgadmin.
         WHERE
         trips."PULocationID" = zpu."LocationID" AND
         trips."DOLocationID" = zdo."LocationID"
+        ```
 
 
     ii) joined_trip_zone_data_2019_09_2nd_way:
-    ```
+        ```
         CREATE TABLE joined_trip_zone_data_2019_09_2nd_way AS
         SELECT
         CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
@@ -203,11 +214,19 @@ Confirmed both tables are in postgres thru pgadmin.
         ON trips."PULocationID" = zpu."LocationID"
         JOIN ny_taxi_zones AS zdo
         ON trips."DOLocationID" = zdo."LocationID"
-    ```
+        ```
+    d)  Verify counts of record on each table
+        ```
+        SELECT COUNT(*)
+        FROM
+        ```
+        SELECT COUNT(*)
+        FROM joined_trip_zone_data_2019_sept
+        ```
 
 
 
-    d) Do a few tests:
+    e) Do a few tests:
         i)Checking for records with Location ID not in the zones table
 
 
