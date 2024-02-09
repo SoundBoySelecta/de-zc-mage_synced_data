@@ -77,43 +77,141 @@ file to postgres. I confirmed the zone table (ny_taxi_zones) was inserted into
 Postgres
 with pgadmin.
 
-Now merging the two data pipeline is needed with the below mods:
+A) Now merging the two data pipeline is needed with the below mods:
 1) Edit name to ingest_1.2.6.py of script to include the taxi zone data
 (remember its a csv not gzip).
 2) duplicate the docker file and name it Dockerfile_1.2.6
 3) edit line 9 ENTRYPOINT to ["python", "ingest_1.2.6.py"]
 4) rebuild image with:
-docker build -f Dockerfile_1.2.6 -t taxi_ingest:v002 .
-added or differentiated:
-trip_table_name = params.trip_table_name
-zone_table_name = params.zone_table_name
-trip_file_name = 'ny_green_taxi_trip.gz'
-zone_file_name = 'zone.csv'
-trip_data_url = params.trip_data_url
-zone_data_url = params.zone_data_url
+    docker build -f Dockerfile_1.2.6 -t taxi_ingest:v002 .
+    added or differentiated:
+    trip_table_name = params.trip_table_name
+    zone_table_name = params.zone_table_name
+    trip_file_name = 'ny_green_taxi_trip.gz'
+    zone_file_name = 'zone.csv'
+    trip_data_url = params.trip_data_url
+    zone_data_url = params.zone_data_url
 
-6 parameters we have add or modify:
-In ingestion script:
-a) modify the ArgumentParser to add:
-zone data url which which will need a zsh variable as before
---> parser.add_argument('--zone_data_url', help='url for the csv file')
+    Six parameters we have add or modify: a x 2, b x 2, c x 2
+    In ingestion script:
+    a) modify the ArgumentParser to add:
+    zone data url which which will need a zsh variable as before
+    --> parser.add_argument('--zone_data_url', help='url for the csv file')
 
---> passed argument --zone_data_url=${zone_data_url}
- b) Differentiate the two tables and modify ingest.py line
-parser.add_argument(
-    '--trip_table_name', help='trip table to be written to in postgres')
-parser.add_argument(
-    '--zone_table_name', help='zone table to be written to in postgres')
-In zsh:
-c) modify the present url to differentiate the two different urls
-represented by the 2 diff zsh vars:
- i) export trip_data_url='https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz'
- to view: echo $trip_data_url
- -->parser.add_argument('--trip_data_url', help='url for the gz file')
- --> passed argument --trip_data_url=${trip_data_url}
+    --> passed argument --zone_data_url=${zone_data_url}
+     b) Differentiate the two tables and modify ingest.py line
+    parser.add_argument(
+        '--trip_table_name', help='trip table to be written to in postgres')
+    parser.add_argument(
+        '--zone_table_name', help='zone table to be written to in postgres')
+    In zsh:
+    c) modify the present url to differentiate the two different urls
+    represented by the 2 diff zsh vars:
+        i) export trip_data_url='https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-09.csv.gz'
+        to view: echo $trip_data_url
+        -->parser.add_argument('--trip_data_url', help='url for the gz file')
+        --> passed argument --trip_data_url=${trip_data_url}
 
-ii) export zone_data_url='https://s3.amazonaws.com/nyc-tlc/misc/taxi+_zone_lookup.csv'
-to view variable: echo $zone_data_url
+        ii) export zone_data_url='https://s3.amazonaws.com/nyc-tlc/misc/taxi+_zone_lookup.csv'
+        to view variable: echo $zone_data_url
+    -->parser.add_argument('--zone_data_url', help='url for the csv file')
+        --> passed argument --zone_data_url=${zone_data_url}
 
 Confirmed both tables are in postgres thru pgadmin.
+
+5) Verify tables with a simple query
+    SELECT *
+    FROM ny_green_taxi_trips
+    LIMIT 10
+
+    SELECT *
+    FROM ny_taxi_zones
+    LIMIT 10
+
+5) Join trip and zone data tables on common id(s), there is 2 columns in trips than need represented but 2 columns respectively in the zones table. So
+   technically we need a few joins.
+       a) First way:
+        SELECT
+        CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
+        CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
+        trips.trip_type,
+        trips.total_amount,
+        trips.trip_distance AS distance,
+        trips.lpep_pickup_datetime AS pickup_time,
+        trips.lpep_dropoff_datetime AS dropoff_time
+        FROM
+        ny_green_taxi_trips AS trips
+        JOIN ny_taxi_zones AS zpu
+        ON trips."PULocationID" = zpu."LocationID"
+        JOIN ny_taxi_zones AS zdo
+        ON trips."DOLocationID" = zdo."LocationID"
+        LIMIT 100
+
+
+        b) Second way:
+        CREATE TABLE joined_trip_zone_data_2019_sept AS
+        SELECT
+        CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
+        CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
+        trips.trip_type,
+        trips.total_amount,
+        trips.trip_distance AS distance,
+        trips.lpep_pickup_datetime AS pickup_time,
+        trips.lpep_dropoff_datetime AS dropoff_time
+        FROM
+        ny_green_taxi_trips AS trips
+        JOIN ny_taxi_zones AS zpu
+        ON trips."PULocationID" = zpu."LocationID"
+        JOIN ny_taxi_zones AS zdo
+        ON trips."DOLocationID" = zdo."LocationID"
+    c) Verify counts of record on each table
+
+    c) Save query as a table:
+     i) joined_trip_zone_data_2019_09_1st_way:
+        CREATE TABLE joined_trip_zone_data_2019_09_1st_way AS
+        SELECT
+        CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
+        CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
+        trips.trip_type,
+        trips.total_amount,
+        trips.trip_distance AS distance,
+        trips.lpep_pickup_datetime AS pickup_time,
+        trips.lpep_dropoff_datetime AS dropoff_time
+        FROM
+        ny_green_taxi_trips AS trips,
+        ny_taxi_zones AS zpu,
+        ny_taxi_zones AS zdo
+        WHERE
+        trips."PULocationID" = zpu."LocationID" AND
+        trips."DOLocationID" = zdo."LocationID"
+
+
+    ii) joined_trip_zone_data_2019_09_2nd_way:
+        CREATE TABLE joined_trip_zone_data_2019_09_2nd_way AS
+        SELECT
+        CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
+        CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
+        trips.trip_type,
+        trips.total_amount,
+        trips.trip_distance AS distance,
+        trips.lpep_pickup_datetime AS pickup_time,
+        trips.lpep_dropoff_datetime AS dropoff_time
+        FROM
+        ny_green_taxi_trips AS trips
+        JOIN ny_taxi_zones AS zpu
+        ON trips."PULocationID" = zpu."LocationID"
+        JOIN ny_taxi_zones AS zdo
+        ON trips."DOLocationID" = zdo."LocationID"
+
+
+
+    d) Do a few tests:
+        i)Checking for records with Location ID not in the zones table
+
+
+
+        ii) Checking for Location IDs in the zones table not in the yellow taxi table
+
+
+
 
