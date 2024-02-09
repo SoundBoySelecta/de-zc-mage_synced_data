@@ -136,7 +136,7 @@ Confirmed both tables are in postgres thru pgadmin.
 
 6) Join trip and zone data tables on common id(s), there is 2 columns in trips than need represented but 2 columns respectively in the zones table. So
    technically we need a few joins.
-       a) First way:
+    a) First way:
         ```
         SELECT
         CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
@@ -156,7 +156,7 @@ Confirmed both tables are in postgres thru pgadmin.
         ```
 
 
-        b) Second way:
+    b) Second way:
         ```
         SELECT
         CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
@@ -176,53 +176,53 @@ Confirmed both tables are in postgres thru pgadmin.
 
 
     c) Save query as a table:
-     i) joined_trip_zone_data_2019_09_1st_way:
-        ```
-        CREATE TABLE joined_trip_zone_data_2019_09_1st_way AS
-        SELECT
-        CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
-        CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
-        trips.trip_type,
-        trips.total_amount,
-        trips.trip_distance AS distance,
-        trips.lpep_pickup_datetime AS pickup_time,
-        trips.lpep_dropoff_datetime AS dropoff_time
-        FROM
-        ny_green_taxi_trips AS trips,
-        ny_taxi_zones AS zpu,
-        ny_taxi_zones AS zdo
-        WHERE
-        trips."PULocationID" = zpu."LocationID" AND
-        trips."DOLocationID" = zdo."LocationID"
-        ```
+        i) joined_trip_zone_data_2019_09_1st_way:
+            ```
+            CREATE TABLE joined_trip_zone_data_2019_09_1st_way AS
+            SELECT
+            CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
+            CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
+            trips.trip_type,
+            trips.total_amount,
+            trips.trip_distance AS distance,
+            trips.lpep_pickup_datetime AS pickup_time,
+            trips.lpep_dropoff_datetime AS dropoff_time
+            FROM
+            ny_green_taxi_trips AS trips,
+            ny_taxi_zones AS zpu,
+            ny_taxi_zones AS zdo
+            WHERE
+            trips."PULocationID" = zpu."LocationID" AND
+            trips."DOLocationID" = zdo."LocationID"
+            ```
 
 
-    ii) joined_trip_zone_data_2019_09_2nd_way:
-        ```
-        CREATE TABLE joined_trip_zone_data_2019_09_2nd_way AS
-        SELECT
-        CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
-        CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
-        trips.trip_type,
-        trips.total_amount,
-        trips.trip_distance AS distance,
-        trips.lpep_pickup_datetime AS pickup_time,
-        trips.lpep_dropoff_datetime AS dropoff_time
-        FROM
-        ny_green_taxi_trips AS trips
-        JOIN ny_taxi_zones AS zpu
-        ON trips."PULocationID" = zpu."LocationID"
-        JOIN ny_taxi_zones AS zdo
-        ON trips."DOLocationID" = zdo."LocationID"
-        ```
+        ii) joined_trip_zone_data_2019_09_2nd_way:
+            ```
+            CREATE TABLE joined_trip_zone_data_2019_09_2nd_way AS
+            SELECT
+            CONCAT(zdo."Borough", '/', zdo."Zone") AS dropoff_location,
+            CONCAT(zpu."Borough", '/', zpu."Zone") AS pickup_location,
+            trips.trip_type,
+            trips.total_amount,
+            trips.trip_distance AS distance,
+            trips.lpep_pickup_datetime AS pickup_time,
+            trips.lpep_dropoff_datetime AS dropoff_time
+            FROM
+            ny_green_taxi_trips AS trips
+            JOIN ny_taxi_zones AS zpu
+            ON trips."PULocationID" = zpu."LocationID"
+            JOIN ny_taxi_zones AS zdo
+            ON trips."DOLocationID" = zdo."LocationID"
+            ```
     d)  Verify counts of record on each table
-        ```
-        SELECT COUNT(*)
-        FROM
-        ```
-        SELECT COUNT(*)
-        FROM joined_trip_zone_data_2019_sept
-        ```
+            ```
+            SELECT COUNT(*)
+            FROM
+            ```
+            SELECT COUNT(*)
+            FROM joined_trip_zone_data_2019_sept
+            ```
 
 
 
