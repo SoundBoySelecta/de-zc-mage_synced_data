@@ -153,7 +153,7 @@ Confirmed both tables are in postgres thru pgadmin.
         JOIN ny_taxi_zones AS zdo
         ON trips."DOLocationID" = zdo."LocationID"
         LIMIT 100
-        ``
+        ```
 
 
         b) Second way:
