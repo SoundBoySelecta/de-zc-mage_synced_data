@@ -1,9 +1,0 @@
-FROM python:3.9.1
-
-RUN pip install pandas
-
-WORKDIR /app
-
-COPY pipeline_1.2.1_no_data.py pipeline_1.2.1_no_data.py
-
-ENTRYPOINT ["python", "pipeline_1.2.1_no_data.py"]
