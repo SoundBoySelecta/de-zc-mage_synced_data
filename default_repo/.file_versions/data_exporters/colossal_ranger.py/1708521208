@@ -1,0 +1,41 @@
+from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import select
+
+if 'data_exporter' not in globals():
+    from mage_ai.data_preparation.decorators import data_exporter
+
+
+@data_exporter
+def export_data(data, *args, **kwargs):
+    """
+    Exports data to some source.
+
+    Args:
+        data: The output from the upstream parent block
+        args: The output from any additional upstream blocks (if applicable)
+
+    Output (optional):
+        Optionally return any object and it'll be logged and
+        displayed when inspecting the block run.
+    """
+    # Specify your data exporting logic here
+    
+    #engine = create_engine("postgresql+psycopg2://scott:tiger@localhost:5432/mydatabase"))
+    engine = create_engine("postgresql://mageuser:postgres@/mage-data-prep-db?host=/cloudsql/proven-catcher-411305:us-west2:mage-data-prep-db-instance")
+    try:
+        engine.connect()
+        print("success")
+    except SQLAlchemyError as err:
+        print("error", err.__cause__)  # this will give what kind of error
+    data.to_sql(name="titanic", con=engine, if_exists='replace')
+    '''
+    Index(['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp',
+
+       'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked'],
+
+      dtype='object')
+    '''
+    
+    stmt = select(titanic).where(titanic.c.name == "spongebob")
+    print(stmt)
