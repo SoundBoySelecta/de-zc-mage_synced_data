@@ -6,8 +6,5 @@ sync_config:
   enable_git_integration: null
   remote_repo_link: https://github.com/SoundBoySelecta/de-zc-mage_synced_data.git
   repo_path: /home/src
-  sync_on_pipeline_run: null
-  sync_on_start: null
   sync_submodules: false
-  type: null
   username: soundboyselecta
